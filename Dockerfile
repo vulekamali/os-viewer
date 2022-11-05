@@ -1,14 +1,13 @@
 FROM node:8.10-alpine
 
+RUN apk add --update --no-cache --virtual=build-dependencies git
+
 WORKDIR /app
-COPY package.json .
+COPY package.json ./
 
-RUN apk add --update --no-cache --virtual=build-dependencies \
-    git \
-    && npm install \
-    && apk del build-dependencies \
-    && rm -rf /var/cache/apk/*
-
+# https://github.com/DmitryBaranovskiy/raphael/issues/993#issuecomment-155957816
+RUN git config --global url."https://".insteadOf git:// \
+    && npm install --loglevel verbose
 
 COPY docker/settings.json /app/settings.json
 COPY . .
